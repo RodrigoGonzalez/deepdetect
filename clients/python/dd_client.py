@@ -58,7 +58,7 @@ class DD(object):
             self.__ddurl = 'https://%s:%d' % (host, port)
 
     def set_return_format(self, f):
-        assert f == self.RETURN_PYTHON or f == self.RETURN_JSON or f == self.RETURN_NONE
+        assert f in [self.RETURN_PYTHON, self.RETURN_JSON, self.RETURN_NONE]
         self.__returntype = f
 
     def __return_data(self, r):
@@ -122,7 +122,7 @@ class DD(object):
                                "mllib": parameters_mllib,
                                "output": parameters_output},
                 "model": model}
-        return self.put(self.__urls["services"] + '/%s' % sname, json=data)
+        return self.put(self.__urls["services"] + f'/{sname}', json=data)
 
     def get_service(self, sname):
         """
@@ -130,7 +130,7 @@ class DD(object):
         Parameters:
         sname -- service name as a resource
         """
-        return self.get(self.__urls["services"] + '/%s' % sname)
+        return self.get(self.__urls["services"] + f'/{sname}')
 
     def delete_service(self, sname, clear=None):
         """
@@ -140,7 +140,7 @@ class DD(object):
         clear -- 'full','lib' or 'mem', optionally clears model repository data
         """
         data = {"clear": clear} if clear else None
-        return self.delete(self.__urls["services"] + '/%s' % sname, json=data)
+        return self.delete(self.__urls["services"] + f'/{sname}', json=data)
 
     # API train
     def post_train(self, sname, data, parameters_input, parameters_mllib, parameters_output, async=True):

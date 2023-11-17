@@ -23,8 +23,7 @@ def image_resize(imgfile,width):
     imgquery = cv2.imread(imgfile)
     r = width / imgquery.shape[1]
     dim = (int(width), int(imgquery.shape[0] * r))
-    small = cv2.resize(imgquery,dim)
-    return small
+    return cv2.resize(imgquery,dim)
 
 host = 'localhost'
 sname = 'imgserv'

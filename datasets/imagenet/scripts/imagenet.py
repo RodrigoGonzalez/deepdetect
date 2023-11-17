@@ -58,14 +58,14 @@ def read_synsets(alldirs,synsets,descs,search,lsynsets):
     for d in alldirs:
         s = Synset(d)
         if lsynsets:
-            if not s._syn in lsynsets:
+            if s._syn not in lsynsets:
                 continue
         s._name = synsets[s._syn]
         if search:
-            if not search in s._name:
+            if search not in s._name:
                 continue
         s._desc = descs[s._syn]
-        s._imgs = glob.glob(d + "/*")
+        s._imgs = glob.glob(f"{d}/*")
         s._img_count = len(s._imgs)
         s._size = sum(os.path.getsize(f) for f in s._imgs if os.path.isfile(f))
         synsetsobj[s._syn] = s
@@ -80,24 +80,22 @@ def find_treemap(lsyn,tmap):
     clsyn = lsyn
     tlsyn = []
     for key in lsyn:
-        ls = tmap[key]
-        if ls:
+        if ls := tmap[key]:
             #tlsyn.remove(key)
             for l in ls:
                 #tlsyn.append(l)
-                ttlsyn = []
-                ttlsyn.append(l)
+                ttlsyn = [l]
                 ttlsyn = find_treemap(ttlsyn,tmap)
                 #print 'ttlsyn=',ttlsyn
                 tlsyn = tlsyn + ttlsyn
-                #print 'tlsyn=',tlsyn
+                            #print 'tlsyn=',tlsyn
     lsyn = clsyn + tlsyn
     return lsyn
 
 def write_dict(files,ffile):
     f = open(ffile,'w')
     for key in files:
-        line = str(key) + ' ' + str(files[key]) + '\n'
+        line = f'{str(key)} {str(files[key])}' + '\n'
         f.write(line)
 
 parser = argparse.ArgumentParser(description='Imagenet processing tools')

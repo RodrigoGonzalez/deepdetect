@@ -36,7 +36,7 @@ def LOG(msg):
     """Output a log message."""
     # XXX: may want to use python log manager classes instead of this stupid print
     if VERBOSE:
-        msg = str(datetime.datetime.now()) + ' ' + msg
+        msg = f'{str(datetime.datetime.now())} {msg}'
         print (msg)
 
 ### Exception classes :
@@ -132,7 +132,7 @@ class DD(object):
 
 
     def set_return_format(self,f):
-        assert f == self.RETURN_PYTHON or f == self.RETURN_JSON or f == self.RETURN_NONE
+        assert f in [self.RETURN_PYTHON, self.RETURN_JSON, self.RETURN_NONE]
         self.__returntype = f
 
     def __return_format(self,js):
@@ -157,8 +157,8 @@ class DD(object):
                 u += '='
                 if argv is not None:
                     u += urllib2.quote(argv)
-                    
-        LOG("GET %s"%u)
+
+        LOG(f"GET {u}")
         response = None
         try:
             req = urllib2.Request(u)
@@ -207,21 +207,17 @@ class DD(object):
         try:
             u = self.__ddurl + method
             if self.__proto == self.__HTTP:
-                LOG("curl -X POST 'http://%s:%s%s' -d '%s'"%(self.__host,
-                                                             self.__port,
-                                                             method,
-                                                             body))
+                LOG(f"curl -X POST 'http://{self.__host}:{self.__port}{method}' -d '{body}'")
                 c=httplib.HTTPConnection(self.__host,self.__port,timeout=DD_TIMEOUT)
             else:
-                LOG("curl -k -X POST 'https://%s:%s%s' -d '%s'"%(self.__host,
-                                                                 self.__port,
-                                                                 method,
-                                                                 body))
+                LOG(
+                    f"curl -k -X POST 'https://{self.__host}:{self.__port}{method}' -d '{body}'"
+                )
                 c=httplib.HTTPSConnection(self.__host,self.__port, timeout=DD_TIMEOUT)
             c.request('POST',method,body,headers)
             r = c.getresponse()
             data = r.read()
-            
+
         except:
             raise DDCommunicationError(u,"POST",headers,body,r)
 
@@ -237,7 +233,7 @@ class DD(object):
     def delete(self, method):
         """DELETE request to DeepDetect server"""
 
-        LOG("DELETE %s"%(method))
+        LOG(f"DELETE {method}")
         r = None
         u = ""
         body = ""
@@ -286,7 +282,7 @@ class DD(object):
         body={"description":description,"mllib":mllib,"type":mltype,
               "parameters":{"input":parameters_input,"mllib":parameters_mllib,"output":parameters_output},
               "model":model}
-        return self.put(self.__urls["services"] + '/%s'%sname,json.dumps(body))
+        return self.put(self.__urls["services"] + f'/{sname}', json.dumps(body))
 
     def get_service(self,sname):
         """
@@ -294,7 +290,7 @@ class DD(object):
         Parameters:
         sname -- service name as a resource
         """
-        return self.get(self.__urls["services"] + '/%s'%sname)
+        return self.get(self.__urls["services"] + f'/{sname}')
 
     def delete_service(self,sname,clear=None):
         """
@@ -303,9 +299,9 @@ class DD(object):
         sname -- service name as a resource
         clear -- 'full','lib' or 'mem', optionally clears model repository data
         """
-        qs = self.__urls["services"] + '/%s'%sname
+        qs = self.__urls["services"] + f'/{sname}'
         if clear:
-            qs += '?clear=' + clear
+            qs += f'?clear={clear}'
         return self.delete(qs)
 
 
